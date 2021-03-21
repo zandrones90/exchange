@@ -1,0 +1,65 @@
+{% extends 'app/account_base.html' %}
+{% block content %}
+<br>
+<div class="row">
+	<div class="col-3">
+      <div class="card card-body">
+          <a class="btn btn-warning" href="{% url 'home' %}">Back to Home</a>
+          <hr>
+          <h4 style="text-align: center">Account {{request.user}}</h4>
+          <hr>
+          <h4 style="text-align: center">Reference Number: {{request.user.id}}</h4>
+      </div>
+    </div>
+    <ul class="col-md-9">
+    <div class="col-md-9">
+        <div class="card card-body">
+        {% for accounts in data.accounts %}
+            <p class="article-content">Name: {{accounts.name}}</p>
+            <p class="article-content">Phone: {{accounts.phone}}</p>
+            <p class="article-content">Email: {{accounts.email}}</p>
+        {% endfor %}
+            <a href="{% url 'account_setting' %}" class="top-menu"><input class="btn-primary" type="submit"  value="Update your info"></a>
+        </div>
+    </div>
+    <br>
+    <div class="col-md-9"><h1>Permission Granted</h1></div>
+        <div class="col-md-9">
+            <div class="card card-body">
+                {% for riga in data.lista%}
+                <h4 class="article-content">{{riga.any}} </h4>
+                {% for choice in riga.subprofile%}
+                    <p class="article-content">Email:               {{choice.email}} </p>
+                    <p class="article-content">Type of Permission:  {{choice.permission}}</p>
+                    <p class="article-content">Data:                {{choice.timestamp}} </p>
+                    <a href="{% url 'delete_permission' email=choice.email %}"><input type="submit" class="btn-primary" value="Delete"></a>
+                <hr>
+                {% endfor %}
+                {% endfor %}
+            </div>
+         </div>
+
+    <br>
+    <div class="col-md-9"><h1>Active orders</h1></div>
+        <div class="col-md-9">
+            <div class="card card-body">
+                <h4 class="article-content">There are {{data.posts}} posts</h4>
+                <a href="{% url 'account_post' %}" class="top-menu"><input class="btn-primary" type="submit"  value="View your posts"></a>
+            </div>
+        </div>
+    <br>
+    <div class="col-md-9"><h1>Other orders</h1></div>
+        <div class="col-md-9">
+            <div class="card card-body">
+                <h4 class="article-content">There are {{data.others}} posts</h4>
+                <a href="{% url 'account_other' %}" class="top-menu"><input class="btn-primary" type="submit"  value="View other posts"></a>
+            </div>
+        </div>
+    <br>
+    </ul>
+</div>
+
+    {% endblock %}
+
+
+

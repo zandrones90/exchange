@@ -1,0 +1,53 @@
+{% extends 'app/account_base.html' %}
+{% block content %}
+<div class="row">
+	<div class="col-3">
+      <div class="card card-body">
+          <a class="btn btn-warning" href="{% url 'account_user' %}">Back to Account</a>
+          <hr>
+          <h4 style="text-align: center">Account {{request.user}}</h4>
+          <hr>
+          <h4 style="text-align: center">Reference Number: {{request.user.id}}</h4>
+      </div>
+    </div>
+
+    <div class="col-8">
+        <div class="content-section">
+         <h3>Balance</h3>
+            <h4 class='text-muted'>Your Balance in BTC is:</h4>
+        {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.totalbtc }}</h4>
+        {% endif %}
+        <hr>
+            <h4 class='text-muted'>Your Balance in EUR is:</h4>
+        {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.totaleur}} €</h4>
+        {% endif %}
+        <hr>
+        </div>
+        <h2>Some Statistics</h2>
+        <div class="content-section">
+            <h4 class='text-muted'>You bought:</h4>
+        {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.btcbuy }} BTC in EUR {{ data.pricebuy }}</h4>
+        {% endif %}
+        <hr>
+            <h4 class='text-muted'>You sold:</h4>
+        {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.btcsell }} BTC in EUR {{ data.pricesell }}</h4>
+        {% endif %}
+        <hr>
+            <h4 class='text-muted'>You made:</h4>
+        {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.ntransactions }} transactions </h4>
+        {% endif %}
+        <hr>
+            <h4 class='text-muted'>for you a BCT in mean worth:</h4>
+        {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.totmean }} EUR </h4>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

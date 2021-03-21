@@ -1,0 +1,43 @@
+{% extends 'app/account_base.html' %}
+{% block content %}
+<div class="row">
+	<div class="col-3">
+      <div class="card card-body">
+          <a class="btn btn-warning" href="{% url 'account_user' %}">Back to Account</a>
+          <hr>
+          <h4 style="text-align: center">Account {{request.user}}</h4>
+          <hr>
+          <h4 style="text-align: center">Reference Number: {{request.user.id}}</h4>
+      </div>
+    </div>
+    <div class="col-9">
+        <div class="content-section">
+            <h3>Balance</h3>
+                <h4 class='text-muted'>Your Balance in BTC is:</h4>
+            {% if user.is_authenticated %}
+            <h4 style="text-align:center">{{ data.btcs }}</h4>
+            {% endif %}
+            <hr>
+                <h4 class='text-muted'>Your Balance in EUR is:</h4>
+            {% if user.is_authenticated %}
+                <h4 style="text-align:center">{{ data.balance}} €</h4>
+            {% endif %}
+            <hr>
+        </div>
+        <h3>Wallet history</h3>
+        <article class="media content-section">
+            <div class="media-body">
+                {% for trans in data.transactions%}
+                    <p class="article-content">Crypto: {{ trans.crypto|linebreaksbr|truncatechars:60 }}</p>
+                    <p class="article-content">Price: {{ trans.unit_price|linebreaksbr|truncatechars:60 }}</p>
+                    <p class="article-content">Quantity: {{ trans.wallet|linebreaksbr|truncatechars:60 }}</p>
+                    <p class="article-content">Date: {{ trans.updated|linebreaksbr|truncatechars:60 }}</p>
+                    <hr>
+                {% endfor %}
+            </div>
+        </article>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'transaction/post_list.html' %}
+
+{% block content %}
+
+    <h2>New order</h2>
+    {% for message in messages %}<p id ='messages'>{{message}}</p>{% endfor %}
+        <hr>
+     <form method="POST" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Place the Order</button>
+     </form>
+        <hr>
+
+{% endblock %}
+
