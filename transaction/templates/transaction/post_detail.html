@@ -1,18 +1,12 @@
 {% extends 'transaction/post_list.html' %}
+
 {% block content %}
- <article class="media content-section">
+        <article class="media content-section">
           <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="#">{{ post.user }}</a>
-              <small class="text-muted">{{ post.datetime }}</small>
-            </div>
-            <h2><a class="article-title" href="{% url 'post_edit' pk=post.pk %}">{{ post.title }}</a></h2>
-            <p class="article-content">Author: {{post.user}}</p>
             <p class="article-content">Amount: {{ post.amount|linebreaksbr|truncatechars:60 }}</p>
-            <p class="article-content">Price per unit: {{ post.price_per_unit|linebreaksbr|truncatechars:60 }}</p>
+            <p class="article-content">Price: {{ post.price|linebreaksbr|truncatechars:60 }}</p>
             <p class="article-content">Buy/Sell: {{ post.type_of_transaction|linebreaksbr|truncatechars:60 }}</p>
-            <p class="article-content">Content: {{ post.content|linebreaksbr }}</p>
             <p class="article-content">Datetime: {{ post.datetime|linebreaksbr|truncatechars:60 }}</p>
           </div>
- </article>
+        </article>
 {% endblock %}

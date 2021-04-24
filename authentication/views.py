@@ -55,7 +55,7 @@ def loginPage(request):
                 # login terminato vado alla HOME
                 return redirect('home')
             else:
-                # se ha sbagliato il login, o l'utente non esiste gli mando un messaggio
+                # se ha sbagliato il login o l'utente non esiste, mando un messaggio
                 messages.info(request, 'username or password is incorrect')
         context = {}
 
@@ -86,10 +86,9 @@ def mongodb(id, email, ip):
     if len(Profile.objects.values()) == 0:
         # popolo Profile con la funzione insert_first
         collection.insert(insert_first(id, email, ip))
-        find = 1
     else:
-        # controllo che l'utente sia già registrato:
-        if trova_user(collection,id) == 'ok':
+        # controllo se l'utente sia già registrato:
+        if find_user(collection,id) == 'ok':
             # creco di prendere l'_id corrisponde al'utente
             _id_cursor=collection.find({'user_id':id})
             for id in _id_cursor:
@@ -97,7 +96,7 @@ def mongodb(id, email, ip):
             for _id in lista_profile:
                 _idobj=_id.get('_id')
             # cerco se l'utene ha  campbiato ip
-            cambia_ip(lista_profile, _idobj, email, ip)
+            change_ip(lista_profile, _idobj, email, ip)
             # se l'utente è già registrato in Profile, si aggiornata l'ora di login
             collection.update({'_id': _idobj}, {"$set": {"timestamp": datetime.datetime.now()}})
             find = 1
@@ -119,8 +118,8 @@ def get_client_ip(request):
     return ip
 
 
-# la funzione trova_user cerca se l'utente corrispondente all'id è già inserito in un documento
-def trova_user(collection, id):
+# la funzione find_user cerca se l'utente corrispondente a id è già inserito in un documento
+def find_user(collection, id):
     id_user=collection.find({'user_id': id})
     for i in id_user:
         if (i.get('user_id')) == id:
@@ -142,12 +141,12 @@ def insert_first(id, email, ip):
     return post
 
 
-# se l'utente cambia ip di ingresso, la funzione cambia_ip aggiorna il profilo dell'utente
-def cambia_ip(collection, id, email, ip):
+# se l'utente change ip di ingresso, la funzione change_ip aggiorna il profilo dell'utente
+def change_ip(collection, id, email, ip):
     # dalla lsita collection estraggo la sezione ips
     for coll in collection:
         ipsn = coll.get('ips')
-        # dalla sezione ips straggo l'ip dell'utente
+        # dalla sezione ips estraggo l'ip dell'utente
         for ips in ipsn:
             ips = ips.get('user_ip')
     # se il nuovo ip è differente da quello vecchio, allora si aggiunge alla lista il nuovo ip
@@ -172,9 +171,8 @@ def drop_btc(id):
     collection_drop = db['authentication_btcwallet']
     post={
         'user_id': id,
-        'crypto': 'BTC',
         'wallet': random()*10,
-        'unit_price': 0.00,
+        'price': 0.00,
         'updated': datetime.datetime.now()
     }
     collection_drop.insert(post)

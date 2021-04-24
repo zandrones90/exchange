@@ -16,11 +16,9 @@
         <article class="media content-section">
             <div class="media-body">
                     <p class="article-content">Id Code: {{p.id}}</p>
-                    <p class="article-content">Author: {{p.posts.user_id}}</p>
                     <p class="article-content">Amount: {{ p.posts.amount|linebreaksbr|truncatechars:60 }}</p>
-                    <p class="article-content">Price : {{ p.posts.price_per_unit|linebreaksbr|truncatechars:60 }}</p>
+                    <p class="article-content">Price: {{ p.posts.price|linebreaksbr|truncatechars:60 }}</p>
                     <p class="article-content">Buy/Sell: {{ p.posts.type_of_transaction|linebreaksbr|truncatechars:60 }}</p>
-                    <p class="article-content">Content: {{ p.posts.content|linebreaksbr|truncatechars:60 }}</p>
                     <p class="article-content">Datetime: {{ p.posts.datetime|linebreaksbr|truncatechars:60 }}</p>
                     <a href="{% url 'delete_post' id=p.id %}"><input type="submit" class="btn-primary" value="Delete"></a>
             </div>

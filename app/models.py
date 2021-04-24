@@ -8,7 +8,7 @@ class Profile(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     # registra gli indirizzi ip dell'utente
     ips = models.Field(default=[])
-    # regostra l'email degli utenti che possono compiere operazioni per te
+    # regostra l'email degli utenti che possono compiere operazioni per te<---APPROFONDISCI
     subprofiles = models.Field(default={})
     # ogni volta che accede si aggiorna la data
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -18,7 +18,7 @@ class Order(models.Model):
     _id = ObjectIdField()
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     buy_sell = models.CharField(max_length=100)
-    user_account = models.CharField(max_length=100)
+    subprofile = models.CharField(max_length=100)# contine l'account dell'altro utente
     datetime = models.DateTimeField(auto_now_add=True)
     price = models.FloatField()
     amount = models.FloatField()
@@ -26,8 +26,8 @@ class Order(models.Model):
 
 class Permission(models.Model):
     STATUS = (
-        ('place orders', 'place order'),
-        ('post messages', 'post messages'),
+        ('sell', 'sell'),
+        ('buy', 'buy'),
         ('all', 'all')
     )
     email = models.Field(blank=True)

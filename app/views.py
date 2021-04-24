@@ -1,12 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
+import datetime
+
+from bson.objectid import ObjectId
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from pymongo import MongoClient
+from transaction.models import Post
+from transaction.views import find_user
+
 from .forms import *
 from .models import *
-from transaction.models import *
-from pymongo import MongoClient
-from django.contrib.auth.models import User
-import datetime
-from bson.objectid import ObjectId
+
 
 # la funzione accountSetting scrive e prende le informazione da Userpage
 def accountSettings(request):
@@ -21,13 +25,13 @@ def accountSettings(request):
     context = {'form': form}
     return render(request, 'app/account_setting.html', context)
 
-# dalla funzione find_odobj prende l'user_id e da userpage recupera l'_id del documento
+
+# la funzione find_odobj prende l'user_id e recupera l'_id del documento
 def find_idobj(customer):
     obj = 0
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
-    # qui va il nome del database (nel mio caso 'transaction_post')
     collection = db['app_userpage']
     user = collection.find({'user_id': customer})
     for u in user:
@@ -42,7 +46,6 @@ def write_account(obj, user_id , name= "...", phone= "...", email="..."):#, phot
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
-    # qui va il nome del database (nel mio caso 'transaction_post')
     collection = db['app_userpage']
     post = {
         'user_id': user_id,
@@ -65,7 +68,7 @@ def account_user(request):
     # richiedo le informazioni corrispondenti all'utente
     account_list = Userpage.objects.values()
     accounts = []
-    listan = []
+    listn = []
     # se è la prima volta che uso il database, lo popolo
     if len(account_list) == 0:
         accounts.append(write_account(find_idobj(user), user))
@@ -80,19 +83,18 @@ def account_user(request):
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
-    # qui va il nome del database (nel mio caso 'app_profile)
     collection = db['app_profile']
     #richiedo da mongodb le informazioni dell'user_id, contenute in permission
     lista = collection.find({'user_id': user})
     for list in lista:
-        listan.append(list)
+        listn.append(list)
     # della sezione profile prendo la lista dei subprofile
-    for lis in listan:
+    for lis in listn:
         a=lis.get('subprofile')
     #se subprofile è vuota, lo faccio sapere
     if len(a) == 0:
-        nessuno = {'any': 'You have not given any permission'}
-        listan.append(nessuno)
+        none = {'any': 'You have not given any permission'}
+        listn.append(none)
     # la funzione find_post_user mi restituisce i posts scritti dall'utente
     posts = len(find_post_user(user))
     # raccolgo i posts scritti dagli utenti a cui l'user ha dato il permesso, e che hanno nel campo permission_user, l'email dell'utente
@@ -102,7 +104,7 @@ def account_user(request):
     # tutte le informazioni  che ho raccolto le metto in un dizionario di nome 'data' e le restituisco alla pagina html
     data = {
         'accounts': accounts,
-        'lista': listan,
+        'lista': listn,
         'posts': posts,
         'others': others,
         'btcs': btc
@@ -112,7 +114,7 @@ def account_user(request):
 
 # la funzione find_post_user recupera i post scritti da user
 def find_post_user(user):
-    lista_post = []
+    list_post = []
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
@@ -120,21 +122,20 @@ def find_post_user(user):
     collection = db['transaction_post']
     post=collection.find({'user_id': user})
     for pos in post:
-        lista_post.append(pos)
-    return lista_post
+        list_post.append(pos)
+    return list_post
 
 
 # la funzione find_post_other recupera i post deggli utenti che hanno avuto il permesso da user e che hanno nella sezione
-# permission_user la variabile email passata alla funzione
+# account la variabile email passata alla funzione
 def find_post_other(email, user):
     other_list = []
-    return_list= []
+    return_list = []
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
-    # qui va il nome del database (nel mio caso 'transaction_post')
     collection = db['transaction_post']
-    posts = collection.find({'permission_user': email})
+    posts = collection.find({'account': email})
     for post in posts:
         other_list.append(post)
     for other in other_list:
@@ -160,7 +161,7 @@ def account_list(request):
 
 
 # la funzione account_other restituisce alla pagine html i post degli utenti che hanno ricevuto il permesso da user,
-# e nella sezione permission_user hanno inserito la variabile email (che corrisponde all'email di user)
+# e nella sezione account hanno inserito la variabile email (che corrisponde all'email di user)
 def account_other(request):
     code_list = []
     user = request.user.id
@@ -176,13 +177,13 @@ def account_other(request):
         i += 1
     return render(request, 'app/account_other.html', {'code': code_list})
 
+
 # recupera i BTC dell' user
 def btc_user(user):
     # richiamo il database
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
-    # qui va il nome del database (nel mio caso 'autentication_btcwallet')
     collection = db['authentication_btcwallet']
     # recupero i BTC regitrati nel wallet
     btc = collection.aggregate(
@@ -191,13 +192,14 @@ def btc_user(user):
         balance = b.get('total')
     return balance
 
+
 # la funzione check_transactions recupera il saldo il EUR, il saldo in BTC e la lista delle transazioni registrate in wallet
 # e le restrituisce in html
 def check_transactions(request):
     id = request.user.id
     saldo = 0
     lista_user = []
-    lista_user = wallet(id)
+    list_user = wallet(id)
     for user in lista_user:
         if user.get('wallet') > 0:
             saldo -= user.get('unit_price')
@@ -205,7 +207,7 @@ def check_transactions(request):
             saldo += user.get('unit_price')
     data = {
         'btcs': btc_user(id),
-        'transactions': lista_user,
+        'transactions': list_user,
         'balance': saldo
     }
     return render(request, 'app/account_transactions.html', {'data': data})
@@ -234,9 +236,9 @@ def statistics(request):
     btc_buy = 0
     btc_sell = 0
     # recupero la lista dei btc registrati in wallet
-    lista_user = wallet(id)
+    list_user = wallet(id)
     # recupero i BTC acquistati/venduti il prezzo per ogni transazione e il costo di un BTC per transazione
-    for user in lista_user:
+    for user in list_user:
         if user.get('wallet') > 0 and user.get('unit_price') > 0:
             btc_buy += user.get('wallet')
             price_buy -= user.get('unit_price')
@@ -251,7 +253,7 @@ def statistics(request):
     total_eur = price_buy + price_sell
     for unit in mean:
        price_tot += unit
-    if len(mean)==0:
+    if len(mean) == 0:
         tot_mean = 0
     else:
         tot_mean = (price_tot/len(mean))
@@ -272,7 +274,7 @@ def account(request):
     return render(request, 'app/account_base.html')
 
 
-# la funzione permissionPage registrai i permissi inseriti da tastiera
+# la funzione permissionPage registra i permessi inseriti da tastiera
 def permissionPage(request):
     id = request.user.id
     formset = PermissionForm()
@@ -281,29 +283,45 @@ def permissionPage(request):
         formset = PermissionForm(request.POST)
         # prende la mail inserita
         email = request.POST.get('email')
-        # prende il tipo di permesso selezionato
+        # prende il tipo di permesso selezionato e la quantità
         permission = request.POST.get('permission')
         if formset.is_valid():
             # se è stata inserito il carettere @ e la funzione mongodb restituisce 1
-            if '@' in email and mongodb(request, id, email, permission) == 1:
-                #il form viene salvato e si torna alla home
-                formset.save()
-            return redirect('/')
+            if '@' in email:
+                response = mongodb(request, id, email, permission)
+                if response == 1:
+                    #il form viene salvato e si torna alla home
+                    formset.save()
+                    return redirect('/')
+                if response == -1:
+                    messages.info(request, 'ATTENTION! SELECT A PERMISSION OR INSERT AN EMAIL')
+                    return render(request, 'app/permission.html', context)
+                if response == -2:
+                    messages.info(request, 'ATTENTION! THIS EMAIL DOES NOT EXIST!')
+                    return render(request, 'app/permission.html', context)
+                if response == -3:
+                    messages.info(request, 'ATTENTION! THIS IS YOUR EMAIL')
+                    return render(request, 'app/permission.html', context)
+            else:
+                messages.info(request, 'ATTENTION! INSERT A VALID EMAIL!')
+                return render(request, 'app/permission.html', context)
     return render(request, 'app/permission.html', context)
 
 
 # gestisce l'inserimento dei dati nel server MongoDB
 def mongodb(request, id, email, permission):
+    email_user = request.user.email
+    if str(email) == str(email_user):
+        return -3
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
     collection = db['app_profile']
-    # write serve per cotrollare se tutto va bene
-    write = 0
-    if len(email) == 0 or len(permission) == 0:
-        write=2
+    if len(permission) == 0 or len(email) == 0:
+        return -1
+    email_checked = check_email(email)
     # controllo che l'email inserita corrisponda a un user registrato
-    if check_email(email) == 1:
+    if email_checked == 1:
         # se l'email esiste, creo un cursore per cercare il documento corrispondente all'id
         user = collection.find({'user_id': id})
         # scorro il cursore per controllore se subprofile è vuoto
@@ -314,13 +332,14 @@ def mongodb(request, id, email, permission):
             collection.update({'user_id': id}, {'$set': {'subprofile': write_permission_first(email, permission)}},
                               upsert=True)
             messages.info(request, 'GREAT!!! YOU GRANTED YOUR FIRST PERMISSION!')
+            return 1
         # se non è vuoto, controllo se l'email sia stata già inserita dall'utente, creando un cursore
         if len(is_first) != 0:
             index = collection.find({'user_id': id}, {'subprofilie': is_first})
             # converto il cursore in stringa per confrontare le stringhe prese con il metodo POST
             for (i) in index:
-                dizionario = str(i).split('{')
-                for row in dizionario:
+                dictionary = str(i).split('{')
+                for row in dictionary:
                     # se l'email e l'autorizzazione sono già presenti, lo faccio sapere all'utente
                     if email in row and permission in row:
                         messages.info(request, 'ATTENTION!!! PERMISSION ALREADY GRANTED!')
@@ -334,15 +353,12 @@ def mongodb(request, id, email, permission):
                         messages.info(request, 'YOU HAVE CHANGED A PERMISSION!')
                         return 1
             # se l'email non esiste aggiungo l'email e il tipo di autorizzazione con la funzione write_permission, e lo faccio sapere all'utente
-            if write == 0:
-                write_permission(id, collection, email, permission)
-                messages.info(request, 'GREAT!!! YOU GRANTED A NEW PERMISSION!')
-                return 1
+            write_permission(id, collection, email, permission)
+            messages.info(request, 'GREAT!!! YOU GRANTED A PERMISSION!')
+            return 1
     # se l'email non esiste lo faccio sapere all'utente
     else:
-        if write != 2:
-            messages.info(request, 'ATTENTION! THIS EMAIL DOES NOT EXIST!')
-            return 0
+        return -2
 
 
 # la funzione check_email controlla che la email inserita corrisponda a un utente registrato
