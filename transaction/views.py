@@ -49,7 +49,7 @@ def post_new(request):
             if result == -2:
                 messages.info(request, 'ATTENTION! YOU DO NOT HAVE THE PERMISSION TO DO THAT')
                 return render(request, 'transaction/post_edit.html', {'form': form})
-            # se il tuo ordine non è stato esuguito del tutto pe rmancanza di compratori/venditori
+            # se il tuo ordine non è stato esuguito del tutto per mancanza di compratori/venditori
             if result == 0:
                 messages.info(request, 'GREAT! PART OF YOUR ORDER HAS BEEN EXECUTED!!! CHECK YOUR BALANCE')
                 return render(request, 'authentication/base.html')
@@ -132,7 +132,7 @@ def transaction(price, type_of_transaction, user, amount, email_permission, perm
         _id = list.get('_id')
         pricetr = list.get('price')
         # se la quantità inserita nell'ordine è pari o superiore a quella trovata in list
-        # e il si vuole effettuare un acquisto
+        # e si vuole effettuare un acquisto
         if float(price) >= float(pricetr) and type_of_transaction == 'BUY':
             # controllo se i destinatari della transazione (cioè coloro che posseggono le email insetite in account),
             # sono diversi
@@ -224,7 +224,7 @@ def update_post(usertr, permission_post, amount, price, type_of_tran, _id):
     collection.update({'_id': _id}, post)
 
 
-# la funzione find_tangle controlla che non ci siano dipendenza tra i soggetti destinatari della transazione.
+# la funzione find_tangle controlla che non ci siano dipendenze tra i soggetti della transazione.
 # se ci sono dipendeze la transazione non va avanti
 def find_tangle(user_a, email_post_a, user_b, email_post_b):
     # se i post sono scritti rispettivamente dai proprietari dell'email inserita
@@ -232,7 +232,7 @@ def find_tangle(user_a, email_post_a, user_b, email_post_b):
         # la transazione va avanti
         return 1
     else:
-        # controllo che i soggetti coninvolti nel post inserito non abbiano concesso permessi ai soggetti coinvolti
+        # controllo che i soggetti coinvolti nel post inserito non abbiano concesso permessi ai soggetti coinvolti
         # nel post trovato. In user_id_list inserisco i soggetti convolti nel post inserito e in email_list i soggetti
         # coinvolti nel post trovato
         user_id_list = [user_a, find_user(email_post_a)]
@@ -241,7 +241,7 @@ def find_tangle(user_a, email_post_a, user_b, email_post_b):
             for email in email_list:
                 if pass_tangle(user, email) == 0:
                     return 0
-        # poichè devo controllare anche se i soggetti coinvolti nel post inserito abbiano ricevuto un'autorizzazion dai
+        # poichè devo controllare anche se i soggetti coinvolti nel post inserito abbiano ricevuto un'autorizzazione dai
         # soggetti del post incotrato, inverto le liste
         user_id_list = [user_b, find_user(email_post_b)]
         email_list = [find_email(user_a), email_post_a]
@@ -269,7 +269,7 @@ def pass_tangle(user, email):
         return 1
 
 
-#la funzione find_email recupera dall' used_id l'email corrispondente
+#la funzione find_email recupera dall'used_id l'email corrispondente
 def find_email(user):
     list_mail = []
     mongo = MongoClient(port=27017)
@@ -288,7 +288,7 @@ def find_email(user):
 def check_transaction(price, type_of_transaction, amount, permission):
     if price == None or amount == None:
         return 4
-    # se l'utente ha inserito amount o prezzo negativo il post non viene considerato
+    # se l'utente ha inserito amount, o prezzo negativo il post non viene considerato
     if amount < 0 or price < 0:
         return 4
     if type_of_transaction == None:
@@ -390,7 +390,7 @@ def order(user, price, final, type_of_transaction, usertr, buy_sell, email_permi
 # la funzione upadate_wallet aggiorna i wallets dei due utenti andando a registrare in autentication_btcwallet tutte le
 # transazioni
 def update_wallet(final, type_of_transaction, user_account, price, permission_post):
-    # recupero l'user_id dell'atro utente
+    # recupero l'user_id dell'altro utente
     usertr = find_user(permission_post)
     mongo = MongoClient(port=27017)
     # qui va il nome del database (nel mio caso 'engine')
@@ -453,7 +453,7 @@ def mongodb_search(email, id, my_mail):
         if str(email) == row.get('email'):
             return 'self'
     print(str(email), row.get('email'))
-    # scorro la lista lista_mongo, per cercare se nella sezione subprofile dell'utente corrispondente alla email
+    # scorro la lista list_mongo, per cercare se nella sezione subprofile dell'utente corrispondente alla email
     # inserita, esiste l'email dell'utente che scrive e il tipo di permesso concesso
     for subprofile in list_mongo:
         for elem in subprofile.get('subprofile'):

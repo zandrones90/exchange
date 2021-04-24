@@ -1,48 +1,10 @@
 1 - sistema il permesso degli altri utenti <--- ok
 2 - elimina il controllo dei doppioni<--- ok
 3 - togli il contenuto <--- ok
-4 - controlla la funzione che fa il match degli ordoni <---
+4 - controlla la funzione che fa il match degli ordoni <--- ok
 5 - controlla il layout dell'order book <--- ok
 6 - rivedi la funzione find_tangle <--- ok
 7 - fai tutte le f in inglese <--- ok
 8 - max_lenght SOLO per i charsfield e non floatfield <--- ok
 9 - scambia solo btc <--- ok
 10 - non inizializzare i floatfield come stringhe <---ok
-
-
-def find_tangle(user_a, email_post_a, user_b, email_post_b):
-    list_subs = []
-    # se i post sono scritti rispettivamente dai proprietari dell'email inserita
-    if user_a == find_user(email_post_a) and user_b == find_user(email_post_b):
-        # la transazione va avanti
-        return 1
-    mongo = MongoClient(port=27017)
-    # qui va il nome del database (nel mio caso 'engine')
-    db = mongo['engine']
-    collection = db['app_profile']
-    # creo 2 liste, una contenente gli account che hanno scritto i post (user_check), e l'altra contenente le email
-    # inserite nella sezione 'account'
-    user_check= [find_user(email_post_a), find_user(email_post_b)]
-    print ('user:', user_check)
-    email_check=[find_email(user_b), email_post_b]
-    print('email:', email_check)
-    i = 0
-    j = 0
-    while j < 2:
-        #controllo che l'email inserita in account non abbia concesso nessuna autorizzazione ai due elementi di user_list
-        lista = collection.find({'user_id': user_check[j]})
-        for lis in lista:
-            list_subs.append(lis)
-        for email in list_subs:
-            for split in email.get('subprofile'):
-
-                if str(email_check[i]) in str(split):
-                    print('relazioni')
-                    #se ci sono dipendenze la transazione non va avanti
-                    return 0
-        if i == 1:
-            j += 1
-            i = -1
-        i += 1
-    # se non ci sono dipendeze allora la transazione va avanti
-    return 1
