@@ -126,7 +126,7 @@ def find_post_user(user):
     return list_post
 
 
-# la funzione find_post_other recupera i post deggli utenti che hanno avuto il permesso da user e che hanno nella sezione
+# la funzione find_post_other recupera i post degli utenti che hanno avuto il permesso da user e che hanno nella sezione
 # account la variabile email passata alla funzione
 def find_post_other(email, user):
     other_list = []
@@ -185,7 +185,7 @@ def btc_user(user):
     # qui va il nome del database (nel mio caso 'engine')
     db = mongo['engine']
     collection = db['authentication_btcwallet']
-    # recupero i BTC regitrati nel wallet
+    # recupero i BTC registrati nel wallet
     btc = collection.aggregate(
         [{'$match': {'user_id': user}}, {'$group': {'_id': '$user_id', 'total': {'$sum': '$wallet'}}}])
     for b in btc:
@@ -194,7 +194,7 @@ def btc_user(user):
 
 
 # la funzione check_transactions recupera il saldo il EUR, il saldo in BTC e la lista delle transazioni registrate in wallet
-# e le restrituisce in html
+# e le restituisce in html
 def check_transactions(request):
     id = request.user.id
     saldo = 0
@@ -237,7 +237,7 @@ def statistics(request):
     btc_sell = 0
     # recupero la lista dei btc registrati in wallet
     list_user = wallet(id)
-    # recupero i BTC acquistati/venduti il prezzo per ogni transazione e il costo di un BTC per transazione
+    # recupero i BTC acquistati/venduti, il prezzo per ogni transazione, e il costo di un BTC per transazione
     for user in list_user:
         if user.get('wallet') > 0 and user.get('unit_price') > 0:
             btc_buy += user.get('wallet')

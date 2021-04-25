@@ -55,7 +55,7 @@ def loginPage(request):
                 # login terminato vado alla HOME
                 return redirect('home')
             else:
-                # se ha sbagliato il login o l'utente non esiste, mando un messaggio
+                # se l'utente ha sbagliato il login, o non esiste, mando un messaggio
                 messages.info(request, 'username or password is incorrect')
         context = {}
 
@@ -141,7 +141,7 @@ def insert_first(id, email, ip):
     return post
 
 
-# se l'utente change ip di ingresso, la funzione change_ip aggiorna il profilo dell'utente
+# se l'utente cambia ip di ingresso, la funzione change_ip aggiorna il profilo dell'utente
 def change_ip(collection, id, email, ip):
     # dalla lsita collection estraggo la sezione ips
     for coll in collection:
