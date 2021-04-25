@@ -2,6 +2,7 @@ from . import views
 from django.urls import path, include
 
 urlpatterns = [
+    path('', include('authentication.urls')),
     path('permission', views.permissionPage, name='permission'),
     path('delete_permission/<str:email>/', views.deletePermission, name='delete_permission'),
     path('delete_post/<str:id>/', views.deletePosts, name='delete_post'),

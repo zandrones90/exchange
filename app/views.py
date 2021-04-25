@@ -302,9 +302,11 @@ def permissionPage(request):
                 if response == -3:
                     messages.info(request, 'ATTENTION! THIS IS YOUR EMAIL')
                     return render(request, 'app/permission.html', context)
+            elif len(email) !=0:
+                    messages.info(request, 'ATTENTION! INSERT A VALID EMAIL!')
+                    return render(request, 'app/permission.html', context)
             else:
-                messages.info(request, 'ATTENTION! INSERT A VALID EMAIL!')
-                return render(request, 'app/permission.html', context)
+                return redirect('/')
     return render(request, 'app/permission.html', context)
 
 
